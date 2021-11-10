@@ -1,0 +1,21 @@
+.genres{
+    display:flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    margin: 10px auto;
+}
+
+.genre{
+    color:white;
+    padding:10px 20px;
+    background-color: orange;
+    border-radius: 50px;
+    margin:5px;
+    display:inline-block;
+    cursor: pointer;
+}
+
+.genre.highlight{
+    background-color: red;
+}
