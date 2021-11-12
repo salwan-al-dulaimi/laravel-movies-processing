@@ -86,13 +86,13 @@ class MoviesController extends Controller
         $movie_db = Movie::where('id', $id)->with('casts', 'crews',)->first();
 
         if ($movie_db) {
-            $movie_db = $movie_db->toArray() + ['credits' => ['casts' => []] + ['crews' => []]] + ['images' => ['backdrops' => []]];
 
+            $movie_db = $movie_db->toArray() + ['credits' => ['cast' => []] + ['crew' => []]] + ['images' => ['backdrops' => []]];
             foreach ($movie_db['casts'] as $key => $cast) {
                 $cast = Cast::where('id', $cast['cast_id'])->first();
                 $cast = $cast->toArray();
 
-                array_push($movie_db['credits']['casts'], $cast);
+                array_push($movie_db['credits']['cast'], $cast);
                 if ($key == 4) {
                     break;
                 }
@@ -102,7 +102,7 @@ class MoviesController extends Controller
                 $crew = Crew::where('id', $crew['crew_id'])->first();
                 $crew = $crew->toArray();
 
-                array_push($movie_db['credits']['crews'], $crew);
+                array_push($movie_db['credits']['crew'], $crew);
                 if ($key == 1) {
                     break;
                 }
@@ -115,13 +115,14 @@ class MoviesController extends Controller
 
                 array_push($movie_db['images']['backdrops'], $image);
             }
-// dd($movie_db);
+            // dd($movie_db);
             $viewModel = new MovieViewModel($movie_db);
         } else {
             $movie_api = Http::withToken(config('services.tmdb.token'))
-                ->get('http://api.themoviedb.org/3/movie/' . $id . '?append_to_response=credits,videos,images')
-                ->json();
+            ->get('http://api.themoviedb.org/3/movie/' . $id . '?append_to_response=credits,videos,images')
+            ->json();
             // dd($movie_api);
+
             $movie_db = new Movie;
 
             $movie_db->id = $movie_api['id'];
@@ -164,12 +165,14 @@ class MoviesController extends Controller
                 $cast_db->character = $cast_api['character'];
                 $cast_db->credit_id = $cast_api['credit_id'];
                 $cast_db->order = $cast_api['order'];
+
                 $cast_db->save();
 
                 $cast_movie_db = new CastMovie;
                 $cast_movie_db->cast_id = $cast_db->id;
                 $cast_movie_db->movie_id = $movie_db->id;
                 $cast_movie_db->save();
+
             }
 
             foreach ($movie_api['credits']['crew'] as $key => $crew_api) {
@@ -191,11 +194,11 @@ class MoviesController extends Controller
                 $crew_movie_db->crew_id = $crew_db->id;
                 $crew_movie_db->movie_id = $movie_db->id;
                 $crew_movie_db->save();
+
             }
 
             // images
             foreach ($movie_api['images']['backdrops'] as $key => $image_api) {
-                // dd($image_api);
                 $image_db = new Image;
 
                 $image_db->movie_id = $movie_db->id;
@@ -207,6 +210,7 @@ class MoviesController extends Controller
                 $image_db->vote_count = $image_api['vote_count'];
                 $image_db->width = $image_api['width'];
                 $image_db->save();
+
             }
 
             $viewModel = new MovieViewModel($movie_api);
