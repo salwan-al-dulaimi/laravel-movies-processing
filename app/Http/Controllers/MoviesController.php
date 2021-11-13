@@ -6,6 +6,7 @@ use App\Models\Cast;
 use App\Models\Crew;
 use App\Models\Image;
 use App\Models\Movie;
+use App\Models\Video;
 use App\Models\Favorite;
 use App\Models\CastMovie;
 use App\Models\CrewMovie;
@@ -87,7 +88,7 @@ class MoviesController extends Controller
 
         if ($movie_db) {
 
-            $movie_db = $movie_db->toArray() + ['credits' => ['cast' => []] + ['crew' => []]] + ['images' => ['backdrops' => []]];
+            $movie_db = $movie_db->toArray() + ['credits' => ['cast' => []] + ['crew' => []]] + ['images' => ['backdrops' => []]] + ['videos' => ['results' => []]];
             foreach ($movie_db['casts'] as $key => $cast) {
                 $cast = Cast::where('id', $cast['cast_id'])->first();
                 $cast = $cast->toArray();
@@ -110,12 +111,17 @@ class MoviesController extends Controller
 
             $images = Image::where('movie_id', $movie_db['id'])->take(9)->get();
             $images = $images->toArray();
-
             foreach ($images as $image) {
-
                 array_push($movie_db['images']['backdrops'], $image);
             }
-            // dd($movie_db);
+
+            $videos = Video::where('movie_id', $movie_db['id'])->take(1)->get();
+            $videos = $videos->toArray();
+            foreach ($videos as $video) {
+                array_push($movie_db['videos']['results'], $video);
+            }
+
+            // dd($movie_db['videos']['results'][0]);
             $viewModel = new MovieViewModel($movie_db);
         } else {
             $movie_api = Http::withToken(config('services.tmdb.token'))
@@ -173,6 +179,9 @@ class MoviesController extends Controller
                 $cast_movie_db->movie_id = $movie_db->id;
                 $cast_movie_db->save();
 
+                if ($key == 4) {
+                    break;
+                }
             }
 
             foreach ($movie_api['credits']['crew'] as $key => $crew_api) {
@@ -195,6 +204,9 @@ class MoviesController extends Controller
                 $crew_movie_db->movie_id = $movie_db->id;
                 $crew_movie_db->save();
 
+                if ($key == 1) {
+                    break;
+                }
             }
 
             // images
@@ -211,6 +223,30 @@ class MoviesController extends Controller
                 $image_db->width = $image_api['width'];
                 $image_db->save();
 
+                if ($key == 8) {
+                    break;
+                }
+            }
+
+            // videos
+            foreach ($movie_api['videos']['results'] as $key => $video_api) {
+                $video_db = new Video;
+
+                $video_db->movie_id = $movie_db->id;
+                $video_db->iso_639_1 = $video_api['iso_639_1'];
+                $video_db->iso_3166_1 = $video_api['iso_3166_1'];
+                $video_db->name = $video_api['name'];
+                $video_db->key = $video_api['key'];
+                $video_db->site = $video_api['site'];
+                $video_db->size = $video_api['size'];
+                $video_db->type = $video_api['type'];
+                $video_db->official = $video_api['official'];
+                $video_db->published_at = $video_api['published_at'];
+                $video_db->save();
+
+                if ($key == 0) {
+                    break;
+                }
             }
 
             $viewModel = new MovieViewModel($movie_api);

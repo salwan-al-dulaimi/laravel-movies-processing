@@ -40,7 +40,7 @@
                     </div>
                 </div>
 
-                {{-- <div x-data="{ isOpen: false }">
+                <div x-data="{ isOpen: false }">
                     @if (count($movie['videos']['results']) > 0)
                         <div class="mt-12">
                             <button @click="isOpen = true"
@@ -85,7 +85,7 @@
                             </div>
                         </template>
                     @endif
-                </div> --}}
+                </div>
             </div>
         </div>
     </div> <!-- end movie-info -->
