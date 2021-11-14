@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
+use App\Models\Movie;
 use App\Models\Favorite;
 use Illuminate\Http\Request;
 use App\ViewModels\MovieViewModel;
@@ -12,7 +13,8 @@ use Illuminate\Support\Facades\Http;
 
 class FavoriteController extends Controller
 {
-    public function create($id){
+    public function create($id)
+    {
         $user = Auth::user()->id;
 
         $userFavorite = Favorite::where('user_id', $user)->where('favorite_id', $id)->get();
@@ -21,29 +23,42 @@ class FavoriteController extends Controller
             $data = Favorite::create([
                 'favorite_id'   => $id,
                 'user_id'       => $user,
-                ]);
+            ]);
             $data->save();
-            }
+        }
         return redirect()->back();
     }
 
-    public function show(){
+    public function show()
+    {
         $user = Auth::user()->id;
         $userFavorite = Favorite::where('user_id', $user)->pluck('favorite_id');
 
         $favorites = [];
+        foreach ($userFavorite as $key => $uf) {
 
-        foreach ($userFavorite as $uf){
-            $movie = Http::withToken(config('services.tmdb.token'))
-            ->get('http://api.themoviedb.org/3/movie/' . $uf . '?append_to_response=credits,videos,images')
-            ->json();
+            $movie = Movie::where('id', $uf)->with('casts', 'crews')->first()->toArray() + ['genres_array' => []];
+            // dd($movie);
+
+            $genres = json_decode($movie['genres']);
+            // $genres = $genres->toArray();
+            // dd($genres);
+
             array_push($favorites, $movie);
+
+            foreach ($genres as $genre_key => $genre) {
+
+                array_push($favorites[$key]['genres_array'], $genre);
+            }
+
         }
         // dd($favorites);
+
         return view('favorite.index', ['favorites' => $favorites]);
     }
 
-    public function destroy($id){
+    public function destroy($id)
+    {
         $user = Auth::user()->id;
         Favorite::where('user_id', $user)->where('favorite_id', $id)->delete();
         return redirect()->back();
