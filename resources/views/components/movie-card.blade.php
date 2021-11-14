@@ -16,7 +16,10 @@
             <div class="row">
                 @if (isset($movie['genres_array']))
                     @foreach ($movie['genres_array'] as $genres_array)
-                        <div class="p-0 col-3 text-gray-400">{{ $genres_array->name }},</div>
+                        <div class="p-0 text-gray-400">{{ $genres_array->name }} </div>
+                        @if (!$loop->last)
+                            <p>, </p>
+                        @endif
                     @endforeach
                 @else
                     <div class="text-gray-400">{{ $movie['genres'] }}</div>

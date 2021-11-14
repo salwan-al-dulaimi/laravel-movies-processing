@@ -19,7 +19,7 @@
                             <span class="mx-2">|</span>
                             @isset ($movie['release_date'])
                                 <span>{{ $movie['release_date'] }}</span>
-                            @endisset                          
+                            @endisset
                         </div>
                         {{-- <div class="text-gray-400">{{ $movie['genres'] }}</div> --}}
                     </div>

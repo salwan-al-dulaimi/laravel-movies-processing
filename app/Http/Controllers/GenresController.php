@@ -25,8 +25,7 @@ class GenresController extends Controller
         $genres = Http::withToken(config('services.tmdb.token'))
             ->get('http://api.themoviedb.org/3/discover/movie?with_genres='. $id )
             ->json()['results'];
-            
-            // dd($genres);
+
             return view('genres.show', ['genres' => $genres]);
     }
 }
