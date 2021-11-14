@@ -30,14 +30,17 @@ class FavoriteController extends Controller
     public function show(){
         $user = Auth::user()->id;
         $userFavorite = Favorite::where('user_id', $user)->pluck('favorite_id');
-        dd($userFavorite[]);
-        foreach ($userFavorite as $uf){ 
+
+        $favorites = [];
+
+        foreach ($userFavorite as $uf){
             $movie = Http::withToken(config('services.tmdb.token'))
             ->get('http://api.themoviedb.org/3/movie/' . $uf . '?append_to_response=credits,videos,images')
             ->json();
+            array_push($favorites, $movie);
         }
-        dd($movie);
-        return view('favorite.index', $movie);
+        // dd($favorites);
+        return view('favorite.index', ['favorites' => $favorites]);
     }
 
     public function destroy($id){
