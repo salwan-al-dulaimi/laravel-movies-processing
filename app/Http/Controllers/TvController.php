@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Http;
 use App\ViewModels\TvViewModel;
 use App\ViewModels\TvShowViewModel;
 
-
 class TvController extends Controller
 {
     /**

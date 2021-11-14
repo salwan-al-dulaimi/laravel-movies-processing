@@ -117,7 +117,6 @@ class MoviesController extends Controller
                 array_push($movie_db['videos']['results'], $video);
             }
 
-            // dd($movie_db['videos']['results'][0]);
             $viewModel = new MovieViewModel($movie_db);
         } else {
             $movie_api = Http::withToken(config('services.tmdb.token'))
