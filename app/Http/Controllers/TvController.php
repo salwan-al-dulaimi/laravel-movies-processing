@@ -71,7 +71,6 @@ class TvController extends Controller
         ->json();
 
         $viewModel = new TvShowViewModel($tvshow);
-        // dd($viewModel);
         return view('tv.show', $viewModel);
     }
 

@@ -6,9 +6,9 @@
 
             <div class="grid grid-cols-1 gap-8" id="moviesGenres">
                 <ul class="genres">
-                    @foreach ($moviegenres as $index=>$item)
+                    @foreach ($genres as $key => $genre)
                         <li class="genre">
-                            <a href="{{ route('genres.show', $moviegenres[$index]["id"]) }}" id="{{$moviegenres[$index]["id"]}}">{{$moviegenres[$index]["name"]}}</a>    
+                            <a href="{{ route('genres.show', $key) }}" id="$key">{{$genre}}</a>
                         </li>
                     @endforeach
                 </ul>
