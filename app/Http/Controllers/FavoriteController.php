@@ -38,11 +38,8 @@ class FavoriteController extends Controller
         foreach ($userFavorite as $key => $uf) {
 
             $movie = Movie::where('id', $uf)->with('casts', 'crews')->first()->toArray() + ['genres_array' => []];
-            // dd($movie);
 
             $genres = json_decode($movie['genres']);
-            // $genres = $genres->toArray();
-            // dd($genres);
 
             array_push($favorites, $movie);
 

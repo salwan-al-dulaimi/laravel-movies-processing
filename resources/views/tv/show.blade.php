@@ -23,13 +23,14 @@
 
                 <div class="mt-12">
                     <div class="flex mt-4">
-                        {{-- @foreach ($tvshow['created_by'] as $crew)
+                        @foreach ($tvshow['created_by'] as $crew)
                             <div class="mr-8">
                                 <div>{{ $crew['name'] }}</div>
                                 <div class="text-sm text-gray-400">Creator</div>
                             </div>
 
-                        @endforeach --}}
+                        @endforeach
+
                     </div>
                 </div>
 

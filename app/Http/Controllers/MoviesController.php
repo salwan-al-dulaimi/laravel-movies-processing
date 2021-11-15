@@ -43,7 +43,7 @@ class MoviesController extends Controller
             $nowPlayingMovies,
             $genres,
         );
-// dd($viewModel->genres);
+        // dd($viewModel->genres);
         return view('movie.index', $viewModel);
     }
 
@@ -118,7 +118,7 @@ class MoviesController extends Controller
             }
 
             $viewModel = new MovieViewModel($movie_db);
-            dd($viewModel);
+            // dd($viewModel);
         } else {
             $movie_api = Http::withToken(config('services.tmdb.token'))
                 ->get('http://api.themoviedb.org/3/movie/' . $id . '?append_to_response=credits,videos,images')
@@ -183,28 +183,34 @@ class MoviesController extends Controller
             }
 
             foreach ($movie_api['credits']['crew'] as $key => $crew_api) {
-                $crew_db = new Crew;
 
-                $crew_db->id = $crew_api['id'];
-                $crew_db->adult = $crew_api['adult'];
-                $crew_db->gender = $crew_api['gender'];
-                $crew_db->known_for_department = $crew_api['known_for_department'];
-                $crew_db->name = $crew_api['name'];
-                $crew_db->original_name = $crew_api['original_name'];
-                $crew_db->popularity = $crew_api['popularity'];
-                $crew_db->profile_path = $crew_api['profile_path'];
-                $crew_db->credit_id = $crew_api['credit_id'];
-                $crew_db->department = $crew_api['department'];
-                $crew_db->job = $crew_api['job'];
-                $crew_db->save();
+                $cast_db = Cast::where('id', $crew_api['id'])->first();
 
-                $crew_movie_db = new CrewMovie;
-                $crew_movie_db->crew_id = $crew_db->id;
-                $crew_movie_db->movie_id = $movie_db->id;
-                $crew_movie_db->save();
+                if (!$cast_db) {
 
-                if ($key == 1) {
-                    break;
+                    $crew_db = new Crew;
+
+                    $crew_db->id = $crew_api['id'];
+                    $crew_db->adult = $crew_api['adult'];
+                    $crew_db->gender = $crew_api['gender'];
+                    $crew_db->known_for_department = $crew_api['known_for_department'];
+                    $crew_db->name = $crew_api['name'];
+                    $crew_db->original_name = $crew_api['original_name'];
+                    $crew_db->popularity = $crew_api['popularity'];
+                    $crew_db->profile_path = $crew_api['profile_path'];
+                    $crew_db->credit_id = $crew_api['credit_id'];
+                    $crew_db->department = $crew_api['department'];
+                    $crew_db->job = $crew_api['job'];
+                    $crew_db->save();
+
+                    $crew_movie_db = new CrewMovie;
+                    $crew_movie_db->crew_id = $crew_db->id;
+                    $crew_movie_db->movie_id = $movie_db->id;
+                    $crew_movie_db->save();
+
+                    if ($key == 1) {
+                        break;
+                    }
                 }
             }
 

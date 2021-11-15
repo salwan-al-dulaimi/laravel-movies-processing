@@ -76,9 +76,13 @@ class TvController extends Controller
         $tv_db = Tv::where('id', $id)->with('casts', 'crews')->first();
 
         if ($tv_db) {
+
             $tv_db = $tv_db->toArray() + ['credits' => ['cast' => []] + ['crew' => []]] + ['images' => ['backdrops' => []]] + ['videos' => ['results' => []]];
+
+            $properties = json_decode($tv_db['created_by'], true);
+            $tv_db['created_by'] = $properties;
+
             foreach ($tv_db['casts'] as $key => $cast) {
-                // dd($cast['cast_id']);
                 $cast = Cast::where('id', $cast['cast_id'])->first();
                 $cast = $cast->toArray();
 
@@ -104,13 +108,14 @@ class TvController extends Controller
                 array_push($tv_db['images']['backdrops'], $image);
             }
 
-            $videos = Video::where('related_id', $tv_db['id'])->where('type', 'movie')->take(1)->get();
+            $videos = Video::where('related_id', $tv_db['id'])->where('type', 'tv')->take(1)->get();
             $videos = $videos->toArray();
             foreach ($videos as $video) {
                 array_push($tv_db['videos']['results'], $video);
             }
 
             $viewModel = new TvShowViewModel($tv_db);
+            // dd($viewModel);
         } else {
 
             $tvshow = Http::withToken(config('services.tmdb.token'))
