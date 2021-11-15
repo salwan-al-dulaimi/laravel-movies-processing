@@ -23,13 +23,13 @@
 
                 <div class="mt-12">
                     <div class="flex mt-4">
-                        @foreach ($tvshow['created_by'] as $crew)
+                        {{-- @foreach ($tvshow['created_by'] as $crew)
                             <div class="mr-8">
                                 <div>{{ $crew['name'] }}</div>
                                 <div class="text-sm text-gray-400">Creator</div>
                             </div>
 
-                        @endforeach
+                        @endforeach --}}
                     </div>
                 </div>
 
@@ -112,7 +112,7 @@
                             "
                             href="#"
                         >
-                            
+
                         <img src="{{ 'https://image.tmdb.org/t/p/w500/'.$image['file_path'] }}" alt="image1" class="hover:opacity-75 transition ease-in-out duration-150">
                     </a>
                 </div>

@@ -15,14 +15,14 @@ class CreateVideosTable extends Migration
     {
         Schema::create('videos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('movie_id')->constraint();
+            $table->string('type');
+            $table->foreignId('related_id')->constraint();
             $table->string('iso_639_1')->nullable();
             $table->string('iso_3166_1')->nullable();
             $table->string('name')->nullable();
             $table->string('key')->nullable();
             $table->string('site')->nullable();
             $table->integer('size')->nullable();
-            $table->string('type')->nullable();
             $table->boolean('official')->nullable();
             $table->string('published_at')->nullable();
 

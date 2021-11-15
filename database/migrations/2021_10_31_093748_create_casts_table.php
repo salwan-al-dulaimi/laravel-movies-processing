@@ -22,7 +22,7 @@ class CreateCastsTable extends Migration
             $table->string('original_name');
             $table->float('popularity');
             $table->string('profile_path')->nullable();
-            $table->integer('cast_id');
+            $table->integer('cast_id')->nullable();
             $table->string('character');
             $table->string('credit_id');
             $table->integer('order');

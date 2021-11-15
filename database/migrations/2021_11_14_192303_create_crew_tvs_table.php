@@ -15,6 +15,8 @@ class CreateCrewTvsTable extends Migration
     {
         Schema::create('crew_tvs', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('crew_id')->constraint();
+            $table->foreignId('tv_id')->constraint();
             $table->timestamps();
         });
     }

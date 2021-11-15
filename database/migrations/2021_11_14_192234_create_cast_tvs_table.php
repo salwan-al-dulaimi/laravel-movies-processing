@@ -15,6 +15,8 @@ class CreateCastTvsTable extends Migration
     {
         Schema::create('cast_tvs', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('cast_id')->constraint();
+            $table->foreignId('tv_id')->constraint();
             $table->timestamps();
         });
     }

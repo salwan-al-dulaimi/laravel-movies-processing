@@ -13,4 +13,9 @@ class Cast extends Model
     {
         return $this->belongsToMany(Movie::class);
     }
+
+    public function tvs()
+    {
+        return $this->belongsToMany(Tv::class);
+    }
 }

@@ -15,7 +15,8 @@ class CreateImagesTable extends Migration
     {
         Schema::create('images', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('movie_id')->constraint();
+            $table->string('type');
+            $table->foreignId('related_id')->constraint();
             $table->float('aspect_ratio')->nullable();
             $table->string('file_path')->nullable();
             $table->integer('height')->nullable();
