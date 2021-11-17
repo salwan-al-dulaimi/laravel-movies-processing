@@ -2,10 +2,15 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TvController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\ActorsController;
 use App\Http\Controllers\GenresController;
 use App\Http\Controllers\MoviesController;
 use App\Http\Controllers\FavoriteController;
+
+
+Route::get('/profile', [UserController::class, 'index'])->name('user.index');
+Route::get('/profile/edit', [UserController::class, 'edit'])->name('user.edit');
 
 Route::get('/', [MoviesController::class, 'index'])->name('movies.index');
 Route::get('/home', [MoviesController::class, 'index']);
