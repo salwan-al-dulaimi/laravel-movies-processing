@@ -9,8 +9,7 @@ use App\Http\Controllers\MoviesController;
 use App\Http\Controllers\FavoriteController;
 
 
-Route::get('/profile', [UserController::class, 'index'])->name('user.index');
-Route::get('/profile/edit', [UserController::class, 'edit'])->name('user.edit');
+Route::resource('user', UserController::class);
 
 Route::get('/', [MoviesController::class, 'index'])->name('movies.index');
 Route::get('/home', [MoviesController::class, 'index']);

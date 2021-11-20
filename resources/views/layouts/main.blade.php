@@ -74,8 +74,9 @@
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     {{ Auth::user()->name }}
-                                    <img class="rounded-full w-8 h-8 float-left"
-                                        src="https://www.kegel8.co.uk/media/wysiwyg/Kegel8/cms/blog/wp/wp-content/uploads/2019/Avatar.jpg"
+                                    <img class="rounded-full w-8 h-8 float-left mr-2"
+                                        {{-- src="https://www.kegel8.co.uk/media/wysiwyg/Kegel8/cms/blog/wp/wp-content/uploads/2019/Avatar.jpg" --}}
+                                        src="{{ asset('storage/'.Auth::user()->image) }}"
                                         alt="">
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
