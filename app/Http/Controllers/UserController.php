@@ -85,6 +85,8 @@ class UserController extends Controller
             $user->image = $request->file('files')->store($path);
         }
         $user->save();
+
+        return redirect()->back();
     }
 
     /**
