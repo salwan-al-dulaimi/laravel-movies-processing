@@ -60,9 +60,14 @@ class ActorsController extends Controller
         $people = People::where('id', $id)->with('socials', 'combinedcredits')->first();
 
         if ($people != null) {
-            // dd('DB');
-            // $actor = $people->toArray();
-            $viewModel = new ActorViewModel($people, $people->socials, $people->combinedcredits);
+            $actor = $people->toArray();
+            $social = $people['socials'][0];
+
+            $credits = Http::withToken(config('services.tmdb.token'))
+            ->get('https://api.themoviedb.org/3/person/' . $id . '/combined_credits')
+            ->json();
+
+            $viewModel = new ActorViewModel($actor, $social, $credits);
         } else {
         //    dd('API'); 
             // people
@@ -93,7 +98,7 @@ class ActorsController extends Controller
             $social = Http::withToken(config('services.tmdb.token'))
             ->get('https://api.themoviedb.org/3/person/' . $id . '/external_ids')
             ->json();
-           
+        //    dd($social);
             $newSocial = new Social();
              
             $newSocial->id = $id;
@@ -111,6 +116,8 @@ class ActorsController extends Controller
             $credits = Http::withToken(config('services.tmdb.token'))
             ->get('https://api.themoviedb.org/3/person/' . $id . '/combined_credits')
             ->json();
+
+            // dd($credits);
 
             $viewModel = new ActorViewModel($actor, $social, $credits);
         }
