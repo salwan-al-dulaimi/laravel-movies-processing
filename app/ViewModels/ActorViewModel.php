@@ -33,9 +33,9 @@ class ActorViewModel extends ViewModel
     public function social()
     {
         return collect($this->social)->merge([
-            'twitter' => $this->social['twitter_id'] ? 'https://twitter.com/' . $this->social['twitter_id'] : null,
-            'facebook' => $this->social['facebook_id'] ? 'https://facebook.com/' . $this->social['facebook_id'] : null,
-            'instagram' => $this->social['instagram_id'] ? 'https://instagram.com/' . $this->social['instagram_id'] : null,
+            'twitter' => isset($this->social['twitter_id']) ? 'https://twitter.com/' . $this->social['twitter_id'] : null,
+            'facebook' => isset($this->social['facebook_id']) ? 'https://facebook.com/' . $this->social['facebook_id'] : null,
+            'instagram' => isset($this->social['instagram_id']) ? 'https://instagram.com/' . $this->social['instagram_id'] : null,
         ])->only([
             'facebook', 'instagram', 'twitter',
         ]);

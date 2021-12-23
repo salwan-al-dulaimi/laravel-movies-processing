@@ -80,7 +80,7 @@ class MoviesController extends Controller
 
         $userFavorite = Favorite::where('user_id', $user)->where('favorite_id', $id)->get()->count();
 
-        $movie_db = Movie::where('id', $id)->with('casts', 'crews',)->first();
+        $movie_db = Movie::where('id', $id)->with('casts', 'crews', )->first();
 
         if ($movie_db) {
             $movie_db = $movie_db->toArray() + ['credits' => ['cast' => []] + ['crew' => []]] + ['images' => ['backdrops' => []]] + ['videos' => ['results' => []]];
@@ -118,7 +118,7 @@ class MoviesController extends Controller
             }
 
             $viewModel = new MovieViewModel($movie_db);
-            // dd($viewModel);
+        // dd($viewModel);
         } else {
             $movie_api = Http::withToken(config('services.tmdb.token'))
                 ->get('http://api.themoviedb.org/3/movie/' . $id . '?append_to_response=credits,videos,images')
@@ -155,38 +155,42 @@ class MoviesController extends Controller
             $movie_db->save();
 
             foreach ($movie_api['credits']['cast'] as $key => $cast_api) {
-                $cast_db = new Cast;
+                $cast = Cast::where('id', $cast_api['id'])->first();
 
-                $cast_db->id = $cast_api['id'];
-                $cast_db->adult = $cast_api['adult'];
-                $cast_db->gender = $cast_api['gender'];
-                $cast_db->known_for_department = $cast_api['known_for_department'];
-                $cast_db->name = $cast_api['name'];
-                $cast_db->original_name = $cast_api['original_name'];
-                $cast_db->popularity = $cast_api['popularity'];
-                $cast_db->profile_path = $cast_api['profile_path'];
-                $cast_db->cast_id = $cast_api['cast_id'];
-                $cast_db->character = $cast_api['character'];
-                $cast_db->credit_id = $cast_api['credit_id'];
-                $cast_db->order = $cast_api['order'];
+                if ($cast == null) {
 
-                $cast_db->save();
+                    $cast_db = new Cast;
 
-                $cast_movie_db = new CastMovie;
-                $cast_movie_db->cast_id = $cast_db->id;
-                $cast_movie_db->movie_id = $movie_db->id;
-                $cast_movie_db->save();
+                    $cast_db->id = $cast_api['id'];
+                    $cast_db->adult = $cast_api['adult'];
+                    $cast_db->gender = $cast_api['gender'];
+                    $cast_db->known_for_department = $cast_api['known_for_department'];
+                    $cast_db->name = $cast_api['name'];
+                    $cast_db->original_name = $cast_api['original_name'];
+                    $cast_db->popularity = $cast_api['popularity'];
+                    $cast_db->profile_path = $cast_api['profile_path'];
+                    $cast_db->cast_id = $cast_api['cast_id'];
+                    $cast_db->character = $cast_api['character'];
+                    $cast_db->credit_id = $cast_api['credit_id'];
+                    $cast_db->order = $cast_api['order'];
 
-                if ($key == 4) {
-                    break;
+                    $cast_db->save();
+
+                    $cast_movie_db = new CastMovie;
+                    $cast_movie_db->cast_id = $cast_db->id;
+                    $cast_movie_db->movie_id = $movie_db->id;
+                    $cast_movie_db->save();
+
+                    if ($key == 4) {
+                        break;
+                    }
                 }
             }
 
             foreach ($movie_api['credits']['crew'] as $key => $crew_api) {
+                $cast_db = Crew::where('id', $crew_api['id'])->first();
 
-                $cast_db = Cast::where('id', $crew_api['id'])->first();
-
-                if (!$cast_db) {
+                if ($cast_db == null) {
 
                     $crew_db = new Crew;
 
