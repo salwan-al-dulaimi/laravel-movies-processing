@@ -16,6 +16,6 @@ class People extends Model
 
     public function combinedcredits()
     {
-        return $this->hasMany(CombinedCredits::class);
+        return $this->hasMany(CombinedCredits::class, 'id');
     }
 }

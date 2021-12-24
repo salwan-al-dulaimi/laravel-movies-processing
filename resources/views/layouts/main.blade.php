@@ -46,9 +46,9 @@
                 <li class="md:ml-6 mt-3 md:mt-0">
                     <a href="{{ route('favorite.show') }}" class="hover:text-gray-300">Favorite</a>
                 </li>
-                {{-- <li class="md:ml-6 mt-3 md:mt-0">
-                    <a href="{{ route('favorite.show') }}" class="hover:text-gray-300">Favorite</a>
-                </li> --}}
+                <li class="md:ml-6 mt-3 md:mt-0">
+                    <a href="{{ route('language.index') }}" class="hover:text-gray-300">Language</a>
+                </li>
             </ul>
             <div>
                 <livewire:search-dropdown>

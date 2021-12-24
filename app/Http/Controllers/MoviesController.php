@@ -43,7 +43,7 @@ class MoviesController extends Controller
             $nowPlayingMovies,
             $genres,
         );
-        // dd($viewModel->genres);
+
         return view('movie.index', $viewModel);
     }
 

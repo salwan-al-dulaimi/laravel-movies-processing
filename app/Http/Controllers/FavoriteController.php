@@ -43,13 +43,11 @@ class FavoriteController extends Controller
 
             array_push($favorites, $movie);
 
-            foreach ($genres as $genre_key => $genre) {
-
+            foreach ($genres as $genre) {
                 array_push($favorites[$key]['genres_array'], $genre);
             }
 
         }
-        // dd($favorites);
 
         return view('favorite.index', ['favorites' => $favorites]);
     }

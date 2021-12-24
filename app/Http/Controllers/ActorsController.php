@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\People;
 use App\Models\Social;
 use Illuminate\Http\Request;
+use App\Models\CombinedCredits;
 use App\ViewModels\ActorViewModel;
 use App\ViewModels\ActorsViewModel;
 use Illuminate\Support\Facades\Http;
@@ -62,6 +63,7 @@ class ActorsController extends Controller
         if ($people != null) {
             $actor = $people->toArray();
             $social = $people['socials'][0];
+            $credits = $people->combinedcredits[0];
 
             $credits = Http::withToken(config('services.tmdb.token'))
             ->get('https://api.themoviedb.org/3/person/' . $id . '/combined_credits')
@@ -69,13 +71,11 @@ class ActorsController extends Controller
 
             $viewModel = new ActorViewModel($actor, $social, $credits);
         } else {
-        //    dd('API'); 
             // people
             $actor = Http::withToken(config('services.tmdb.token'))
             ->get('https://api.themoviedb.org/3/person/' . $id)
             ->json();
 
-            // dd($actor);
             $people = new People();
 
             $people->id = $actor['id'];
@@ -98,7 +98,7 @@ class ActorsController extends Controller
             $social = Http::withToken(config('services.tmdb.token'))
             ->get('https://api.themoviedb.org/3/person/' . $id . '/external_ids')
             ->json();
-        //    dd($social);
+
             $newSocial = new Social();
              
             $newSocial->id = $id;
@@ -117,12 +117,27 @@ class ActorsController extends Controller
             ->get('https://api.themoviedb.org/3/person/' . $id . '/combined_credits')
             ->json();
 
-            // dd($credits);
+            $newCredits = new CombinedCredits();
+
+            $newCredits->id = $id;
+            $newCreditsCast = [];
+            $newCreditsCrew = [];
+            
+            foreach ($credits['cast'] as $cast) {
+                array_push($newCreditsCast, $cast['id']);
+            }
+
+            foreach ($credits['crew'] as $crew) {
+                array_push($newCreditsCrew, $crew['id']);
+            }
+
+            $newCredits['cast'] = json_encode($newCreditsCast);
+            $newCredits['crew'] = json_encode($newCreditsCrew);
+
+            $newCredits->save();
 
             $viewModel = new ActorViewModel($actor, $social, $credits);
         }
-
-        // dd($viewModel);
 
         return view('actors.show', $viewModel);
     }

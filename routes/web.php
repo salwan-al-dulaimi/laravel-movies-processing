@@ -7,6 +7,7 @@ use App\Http\Controllers\ActorsController;
 use App\Http\Controllers\GenresController;
 use App\Http\Controllers\MoviesController;
 use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\LanguageController;
 
 
 Route::resource('user', UserController::class);
@@ -28,3 +29,7 @@ Route::get('/genres/{id}', [GenresController::class, 'show'])->name('genres.show
 Route::get('/favorite/create/{id}', [FavoriteController::class, 'create'])->name('favorite.create')->middleware('auth');
 Route::get('/favorite/show/', [FavoriteController::class, 'show'])->name('favorite.show')->middleware('auth');
 Route::get('/favorite/destroy/{id}', [FavoriteController::class, 'destroy'])->name('favorite.destroy')->middleware('auth');
+
+
+Route::get('/language', [LanguageController::class, 'index'])->name('language.index');
+Route::get('/language/{id}', [LanguageController::class, 'show'])->name('language.show')->middleware('auth');

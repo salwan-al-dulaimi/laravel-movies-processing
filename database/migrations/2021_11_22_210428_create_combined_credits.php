@@ -16,12 +16,8 @@ class CreateCombinedCredits extends Migration
         Schema::create('combined_credits', function (Blueprint $table) {
             $table->id();
 
-            $table->integer('people_id');
-            $table->string('title');
-            $table->string('media_type');
-            $table->string('poster_path')->nullable();
-            $table->string('release_date')->nullable();
-            $table->string('character')->nullable();
+            $table->json('cast')->nullable();
+            $table->json('crew')->nullable();
            
             $table->timestamps();
         });
