@@ -29,14 +29,13 @@ class LanguagesViewModel extends ViewModel
             return [$genre['id'] => $genre['name']];
         });
     }
-
     private function formatMovies($movies)
     {
-        return collect($movies)->map(function($language) {
+        return collect($movies)->SortByDesc('vote_average')->map(function($language) {
             $genresFormatted = collect($language['genre_ids'])->mapWithKeys(function($value) {
                 return [$value => $this->genres()->get($value)];
             })->implode(', ');
-
+            
             return collect($language)->merge([
                 'poster_path' => 'https://image.tmdb.org/t/p/w500/'.$language['poster_path'],
                 'vote_average' => $language['vote_average'] * 10 .'%',

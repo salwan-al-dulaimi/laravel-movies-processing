@@ -16,6 +16,14 @@ class LanguageController extends Controller
 
         return view('language.index', ['languages' => $languages]);
     }
+    public function countries()
+    {
+        $countries = Http::withToken(config('services.tmdb.token'))
+        ->get('http://api.themoviedb.org/3/configuration/countries')
+        ->json();
+        dd($countries);
+        return view('language.index', ['languages' => $languages]);
+    }
 
     public function show($id)
     {

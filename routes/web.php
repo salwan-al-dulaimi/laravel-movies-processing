@@ -30,6 +30,6 @@ Route::get('/favorite/create/{id}', [FavoriteController::class, 'create'])->name
 Route::get('/favorite/show/', [FavoriteController::class, 'show'])->name('favorite.show')->middleware('auth');
 Route::get('/favorite/destroy/{id}', [FavoriteController::class, 'destroy'])->name('favorite.destroy')->middleware('auth');
 
-
 Route::get('/language', [LanguageController::class, 'index'])->name('language.index');
+Route::get('/language/countries', [LanguageController::class, 'countries'])->name('language.countries');
 Route::get('/language/{id}', [LanguageController::class, 'show'])->name('language.show')->middleware('auth');

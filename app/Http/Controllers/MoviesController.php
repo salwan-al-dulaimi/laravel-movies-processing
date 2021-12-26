@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cast;
 use App\Models\Crew;
+use App\Models\Genre;
 use App\Models\Image;
 use App\Models\Movie;
 use App\Models\Video;
@@ -26,18 +27,40 @@ class MoviesController extends Controller
      */
     public function index()
     {
-        $popularMovies = Http::withToken(config('services.tmdb.token'))
-            ->get('https://api.themoviedb.org/3/movie/popular')
-            ->json()['results'];
-
-        $nowPlayingMovies = Http::withToken(config('services.tmdb.token'))
+        $popularMovies = cache()->remember('movies', 60*60*24, function () {
+            return Http::withToken(config('services.tmdb.token'))
+                ->get('https://api.themoviedb.org/3/movie/popular')
+                ->json()['results'];
+        });
+        
+        $nowPlayingMovies = cache()->remember('nowMovies', 60*60*24, function () {
+            return Http::withToken(config('services.tmdb.token'))
             ->get('https://api.themoviedb.org/3/movie/now_playing')
             ->json()['results'];
+        });
+           
+        $genres = cache()->remember('genres', 30*60*60*24, function () {
+            return Genre::all();
+        });
 
-        $genres = Http::withToken(config('services.tmdb.token'))
-            ->get('https://api.themoviedb.org/3/genre/movie/list')
-            ->json()['genres'];
+        if ($genres->count() != 19) {
+            $genres = Http::withToken(config('services.tmdb.token'))
+                ->get('https://api.themoviedb.org/3/genre/movie/list')
+                ->json()['genres'];
 
+            foreach ($genres as $genre) {
+                // dd($genre['id']);
+                $genre_db = Cast::where('id', $genre['id'])->first();
+
+                if ($genre_db == null) {
+                    $genre_new = new Genre();
+                    $genre_new->id = $genre['id'];
+                    $genre_new->name = $genre['name'];
+                    $genre_new->save();
+                }
+            }
+        }
+        
         $viewModel = new MoviesViewModel(
             $popularMovies,
             $nowPlayingMovies,
@@ -158,7 +181,6 @@ class MoviesController extends Controller
                 $cast = Cast::where('id', $cast_api['id'])->first();
 
                 if ($cast == null) {
-
                     $cast_db = new Cast;
 
                     $cast_db->id = $cast_api['id'];
@@ -191,7 +213,6 @@ class MoviesController extends Controller
                 $cast_db = Crew::where('id', $crew_api['id'])->first();
 
                 if ($cast_db == null) {
-
                     $crew_db = new Crew;
 
                     $crew_db->id = $crew_api['id'];
