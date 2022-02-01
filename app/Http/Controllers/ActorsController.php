@@ -61,6 +61,7 @@ class ActorsController extends Controller
         $people = People::where('id', $id)->with('socials', 'combinedcredits')->first();
 
         if ($people != null) {
+            
             $actor = $people->toArray();
             $social = $people['socials'][0];
             $credits = $people->combinedcredits[0];
@@ -94,24 +95,29 @@ class ActorsController extends Controller
             $people->homepage = $actor['homepage'];
 
             $people->save();
-            
-            $social = Http::withToken(config('services.tmdb.token'))
-            ->get('https://api.themoviedb.org/3/person/' . $id . '/external_ids')
-            ->json();
 
-            $newSocial = new Social();
-             
-            $newSocial->id = $id;
-            $newSocial->people_id = $actor['id'];
-            $newSocial->imdb_id = $social['imdb_id'];
-            $newSocial->facebook_id = $social['facebook_id'];
-            $newSocial->freebase_mid = $social['freebase_mid'];
-            $newSocial->freebase_id = $social['freebase_id'];
-            $newSocial->tvrage_id = $social['tvrage_id'];
-            $newSocial->twitter_id = $social['twitter_id'];
-            $newSocial->instagram_id = $social['instagram_id'];
+            $social = Social::where('id', $id)->first();
 
-            $newSocial->save();
+            if ($social == null) {
+                # code...
+                $social = Http::withToken(config('services.tmdb.token'))
+                ->get('https://api.themoviedb.org/3/person/' . $id . '/external_ids')
+                ->json();
+                
+                $newSocial = new Social();
+                
+                $newSocial->id = $id;
+                $newSocial->people_id = $actor['id'];
+                $newSocial->imdb_id = $social['imdb_id'];
+                $newSocial->facebook_id = $social['facebook_id'];
+                $newSocial->freebase_mid = $social['freebase_mid'];
+                $newSocial->freebase_id = $social['freebase_id'];
+                $newSocial->tvrage_id = $social['tvrage_id'];
+                $newSocial->twitter_id = $social['twitter_id'];
+                $newSocial->instagram_id = $social['instagram_id'];
+                
+                $newSocial->save();
+            }
             
             $credits = Http::withToken(config('services.tmdb.token'))
             ->get('https://api.themoviedb.org/3/person/' . $id . '/combined_credits')
@@ -130,7 +136,6 @@ class ActorsController extends Controller
             foreach ($credits['crew'] as $crew) {
                 array_push($newCreditsCrew, $crew['id']);
             }
-
             $newCredits['cast'] = json_encode($newCreditsCast);
             $newCredits['crew'] = json_encode($newCreditsCrew);
 
