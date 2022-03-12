@@ -9,7 +9,6 @@ use App\Http\Controllers\MoviesController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\LanguageController;
 
-
 Route::resource('user', UserController::class);
 
 Route::get('/', [MoviesController::class, 'index'])->name('movies.index');

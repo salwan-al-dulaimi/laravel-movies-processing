@@ -42,24 +42,25 @@ class MoviesController extends Controller
         $genres = cache()->remember('genres', 30*60*60*24, function () {
             return Genre::all();
         });
+        
+        // $genres = Genre::all();
 
-        if ($genres->count() != 19) {
-            $genres = Http::withToken(config('services.tmdb.token'))
-                ->get('https://api.themoviedb.org/3/genre/movie/list')
-                ->json()['genres'];
+        // if ($genres->count() != 19) {
+        //     $genres = Http::withToken(config('services.tmdb.token'))
+        //         ->get('https://api.themoviedb.org/3/genre/movie/list')
+        //         ->json()['genres'];
 
-            foreach ($genres as $genre) {
-                // dd($genre['id']);
-                $genre_db = Cast::where('id', $genre['id'])->first();
+        //     foreach ($genres as $genre) {
+        //         $genre_db = Genre::where('name', $genre['name'])->first();
 
-                if ($genre_db == null) {
-                    $genre_new = new Genre();
-                    $genre_new->id = $genre['id'];
-                    $genre_new->name = $genre['name'];
-                    $genre_new->save();
-                }
-            }
-        }
+        //         if ($genre_db->name != $genre['name']) {
+        //             $genre_new = new Genre();
+        //             $genre_new->id = $genre['id'];
+        //             $genre_new->name = $genre['name'];
+        //             $genre_new->save();
+        //         }
+        //     }
+        // }
         
         $viewModel = new MoviesViewModel(
             $popularMovies,
