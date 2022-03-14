@@ -39,6 +39,8 @@ class MoviesController extends Controller
             ->json()['results'];
         });
            
+        // If the genres not in the DB not use the cache and uncomment the if let it run 
+        // to save all genres in the DDB from the API
         $genres = cache()->remember('genres', 30*60*60*24, function () {
             return Genre::all();
         });
@@ -104,7 +106,7 @@ class MoviesController extends Controller
 
         $userFavorite = Favorite::where('user_id', $user)->where('favorite_id', $id)->get()->count();
 
-        $movie_db = Movie::where('id', $id)->with('casts', 'crews', )->first();
+        $movie_db = Movie::where('id', $id)->with('casts', 'crews')->first();
 
         if ($movie_db) {
             $movie_db = $movie_db->toArray() + ['credits' => ['cast' => []] + ['crew' => []]] + ['images' => ['backdrops' => []]] + ['videos' => ['results' => []]];
