@@ -104,12 +104,14 @@ class MoviesController extends Controller
     {
         $user = Auth::user()->id;
 
-        $userFavorite = Favorite::where('user_id', $user)->where('favorite_id', $id)->get()->count();
+        $userFavorite = Favorite::where('user_id', $user)->where('favorite_id', $id)->select('id')->first();
 
         $movie_db = Movie::where('id', $id)->with('casts', 'crews')->first();
 
         if ($movie_db) {
+            // dd($movie_db);
             $movie_db = $movie_db->toArray() + ['credits' => ['cast' => []] + ['crew' => []]] + ['images' => ['backdrops' => []]] + ['videos' => ['results' => []]];
+            // dd($movie_db);
             foreach ($movie_db['casts'] as $key => $cast) {
                 $cast = Cast::where('id', $cast['cast_id'])->first();
 

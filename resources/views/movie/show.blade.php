@@ -52,7 +52,8 @@
                                 </svg>
                                 <span class="ml-2">Play Trailer</span>
                             </button>
-                            @if ($userFavorite == 0)
+
+                            @if (is_null($userFavorite))
                                 <a href="{{ route('favorite.create', $movie['id']) }}" class="btn btn-warning"
                                     title="like"><i class="fas fa-heart fa-lg"></i></a>
                             @else
