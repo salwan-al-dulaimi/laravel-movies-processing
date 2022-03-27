@@ -102,19 +102,19 @@ class MoviesController extends Controller
      */
     public function show($id)
     {
+        
         $user = Auth::user()->id;
-
+        
         $userFavorite = Favorite::where('user_id', $user)->where('favorite_id', $id)->select('id')->first();
-
+        
         $movie_db = Movie::where('id', $id)->with('casts', 'crews')->first();
 
         if ($movie_db) {
-            // dd($movie_db);
+
             $movie_db = $movie_db->toArray() + ['credits' => ['cast' => []] + ['crew' => []]] + ['images' => ['backdrops' => []]] + ['videos' => ['results' => []]];
-            // dd($movie_db);
+
             foreach ($movie_db['casts'] as $key => $cast) {
                 $cast = Cast::where('id', $cast['cast_id'])->first();
-
                 $cast = $cast->toArray();
 
                 array_push($movie_db['credits']['cast'], $cast);
@@ -146,12 +146,11 @@ class MoviesController extends Controller
             }
 
             $viewModel = new MovieViewModel($movie_db);
-        // dd($viewModel);
+
         } else {
             $movie_api = Http::withToken(config('services.tmdb.token'))
                 ->get('http://api.themoviedb.org/3/movie/' . $id . '?append_to_response=credits,videos,images')
                 ->json();
-            // dd($movie_api);
 
             $movie_db = new Movie;
 
@@ -287,7 +286,7 @@ class MoviesController extends Controller
 
             $viewModel = new MovieViewModel($movie_api);
         }
-        // dd($viewModel);
+
         return view('movie.show', $viewModel)->with(['userFavorite' => $userFavorite]);
     }
 

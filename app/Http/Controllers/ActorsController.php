@@ -59,9 +59,8 @@ class ActorsController extends Controller
     public function show($id)
     {
         $people = People::where('id', $id)->with('socials', 'combinedcredits')->first();
-
+        
         if ($people != null) {
-            
             $actor = $people->toArray();
             $social = $people['socials'][0];
             $credits = $people->combinedcredits[0];
@@ -76,6 +75,8 @@ class ActorsController extends Controller
             $actor = Http::withToken(config('services.tmdb.token'))
             ->get('https://api.themoviedb.org/3/person/' . $id)
             ->json();
+
+            // dd($actor);
 
             $people = new People();
 

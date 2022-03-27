@@ -11,24 +11,37 @@ use App\Http\Controllers\LanguageController;
 
 Route::resource('user', UserController::class);
 
-Route::get('/', [MoviesController::class, 'index'])->name('movies.index');
-Route::get('/home', [MoviesController::class, 'index']);
-Route::get('/movies/{movie}', [MoviesController::class, 'show'])->name('movies.show')->middleware('auth');
+Route::controller(MoviesController::class)->group(function(){
+    Route::get('/', 'index')->name('movies.index');
+    Route::get('/home', 'index');
+    Route::get('/movies/{movie}', 'show')->name('movies.show')->middleware('auth');
+});
 
-Route::get('/tv', [TvController::class, 'index'])->name('tv.index');
-Route::get('/tv/{id}', [TvController::class, 'show'])->name('tv.show')->middleware('auth');
+Route::controller(TvController::class)->group(function(){
+    Route::get('/tv', 'index')->name('tv.index');
+    Route::get('/tv/{id}', 'show')->name('tv.show')->middleware('auth');
+});
 
-Route::get('/actors', [ActorsController::class, 'index'])->name('actors.index');
-Route::get('/actors/page/{page?}', [ActorsController::class, 'index']);
-Route::get('/actors/{actor}', [ActorsController::class, 'show'])->name('actors.show')->middleware('auth');
+Route::controller(ActorsController::class)->group(function(){
+    Route::get('/actors', 'index')->name('actors.index');
+    Route::get('/actors/page/{page?}', 'index');
+    Route::get('/actors/{actor}', 'show')->name('actors.show')->middleware('auth');
+});
 
-Route::get('/genres', [GenresController::class, 'index'])->name('genres.index');
-Route::get('/genres/{id}', [GenresController::class, 'show'])->name('genres.show')->middleware('auth');
+Route::controller(GenresController::class)->group(function(){
+    
+    Route::get('/genres', 'index')->name('genres.index');
+    Route::get('/genres/{id}', 'show')->name('genres.show')->middleware('auth');
+});
 
-Route::get('/favorite/create/{id}', [FavoriteController::class, 'create'])->name('favorite.create')->middleware('auth');
-Route::get('/favorite/show/', [FavoriteController::class, 'show'])->name('favorite.show')->middleware('auth');
-Route::get('/favorite/destroy/{id}', [FavoriteController::class, 'destroy'])->name('favorite.destroy')->middleware('auth');
+Route::controller(FavoriteController::class)->group(function(){
+    Route::get('/favorite/create/{id}', 'create')->name('favorite.create')->middleware('auth');
+    Route::get('/favorite/show/', 'show')->name('favorite.show')->middleware('auth');
+    Route::get('/favorite/destroy/{id}', 'destroy')->name('favorite.destroy')->middleware('auth');
+});
 
-Route::get('/language', [LanguageController::class, 'index'])->name('language.index');
-Route::get('/language/countries', [LanguageController::class, 'countries'])->name('language.countries');
-Route::get('/language/{id}', [LanguageController::class, 'show'])->name('language.show')->middleware('auth');
+Route::controller(LanguageController::class)->group(function(){
+    Route::get('/language', 'index')->name('language.index');
+    Route::get('/language/countries', 'countries')->name('language.countries');
+    Route::get('/language/{id}', 'show')->name('language.show')->middleware('auth');
+});
