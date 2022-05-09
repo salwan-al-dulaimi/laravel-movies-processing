@@ -152,55 +152,55 @@ class MoviesController extends Controller
                 ->get('http://api.themoviedb.org/3/movie/' . $id . '?append_to_response=credits,videos,images')
                 ->json();
 
-            $movie_db = new Movie;
+            $movie_db = Movie::create([
+                'id' => $movie_api['id'],
+                'adult' => $movie_api['adult'],
+                'backdrop_path' => $movie_api['backdrop_path'],
+                'budget' => $movie_api['budget'],
+                'genres' => json_encode($movie_api['genres']),
+                'homepage' => $movie_api['homepage'],
+                'imdb_id' => $movie_api['imdb_id'],
+                'original_language' => $movie_api['original_language'],
+                'original_title' => $movie_api['original_title'],
+                'overview' => $movie_api['overview'],
+                'popularity' => $movie_api['popularity'],
+                'poster_path' => $movie_api['poster_path'],
+                'production_companies' => json_encode($movie_api['production_companies']),
+                'production_countries' => json_encode($movie_api['production_countries']),
+                'release_date' => $movie_api['release_date'],
+                'revenue' => $movie_api['revenue'],
+                'runtime' => $movie_api['runtime'],
+                'spoken_languages' => json_encode($movie_api['spoken_languages']),
+                'status' => $movie_api['status'],
+                'tagline' => $movie_api['tagline'],
+                'title' => $movie_api['title'],
+                'video' => $movie_api['video'],
+                'vote_average' => $movie_api['vote_average'],
+                'vote_count' => $movie_api['vote_count'],
+            ]);
 
-            $movie_db->id = $movie_api['id'];
-            $movie_db->adult = $movie_api['adult'];
-            $movie_db->backdrop_path = $movie_api['backdrop_path'];
-            $movie_db->budget = $movie_api['budget'];
-            $movie_db['genres'] = json_encode($movie_api['genres']);
-            $movie_db->homepage = $movie_api['homepage'];
-            $movie_db->imdb_id = $movie_api['imdb_id'];
-            $movie_db->original_language = $movie_api['original_language'];
-            $movie_db->original_title = $movie_api['original_title'];
-            $movie_db->overview = $movie_api['overview'];
-            $movie_db->popularity = $movie_api['popularity'];
-            $movie_db->poster_path = $movie_api['poster_path'];
-            $movie_db['production_companies'] = json_encode($movie_api['production_companies']);
-            $movie_db['production_countries'] = json_encode($movie_api['production_countries']);
-            $movie_db->release_date = $movie_api['release_date'];
-            $movie_db->revenue = $movie_api['revenue'];
-            $movie_db->runtime = $movie_api['runtime'];
-            $movie_db['spoken_languages'] = json_encode($movie_api['spoken_languages']);
-            $movie_db->status = $movie_api['status'];
-            $movie_db->tagline = $movie_api['tagline'];
-            $movie_db->title = $movie_api['title'];
-            $movie_db->video = $movie_api['video'];
-            $movie_db->vote_average = $movie_api['vote_average'];
-            $movie_db->vote_count = $movie_api['vote_count'];
-
-            $movie_db->save();
+            // $movie_db->save();
 
             foreach ($movie_api['credits']['cast'] as $key => $cast_api) {
                 $cast = Cast::where('id', $cast_api['id'])->first();
 
                 if ($cast == null) {
-                    $cast_db = new Cast;
+                    $cast_db = Cast::create([
+                        'id' => $cast_api['id'],
+                        'adult' => $cast_api['adult'],
+                        'gender' => $cast_api['gender'],
+                        'known_for_department' => $cast_api['known_for_department'],
+                        'name' => $cast_api['name'],
+                        'original_name' => $cast_api['original_name'],
+                        'popularity' => $cast_api['popularity'],
+                        'profile_path' => $cast_api['profile_path'],
+                        'cast_id' => $cast_api['cast_id'],
+                        'character' => $cast_api['character'],
+                        'credit_id' => $cast_api['credit_id'],
+                        'order' => $cast_api['order'],
+                    ]);
 
-                    $cast_db->id = $cast_api['id'];
-                    $cast_db->adult = $cast_api['adult'];
-                    $cast_db->gender = $cast_api['gender'];
-                    $cast_db->known_for_department = $cast_api['known_for_department'];
-                    $cast_db->name = $cast_api['name'];
-                    $cast_db->original_name = $cast_api['original_name'];
-                    $cast_db->popularity = $cast_api['popularity'];
-                    $cast_db->profile_path = $cast_api['profile_path'];
-                    $cast_db->cast_id = $cast_api['cast_id'];
-                    $cast_db->character = $cast_api['character'];
-                    $cast_db->credit_id = $cast_api['credit_id'];
-                    $cast_db->order = $cast_api['order'];
-
-                    $cast_db->save();
+                    // $cast_db->save();
 
                     $cast_movie_db = new CastMovie;
                     $cast_movie_db->cast_id = $cast_db->id;
