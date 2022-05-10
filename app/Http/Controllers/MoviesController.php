@@ -27,24 +27,24 @@ class MoviesController extends Controller
      */
     public function index()
     {
-        $popularMovies = cache()->remember('movies', 60*60*24, function () {
+        $popularMovies = cache()->remember('movies', 60 * 60 * 24, function () {
             return Http::withToken(config('services.tmdb.token'))
                 ->get('https://api.themoviedb.org/3/movie/popular')
                 ->json()['results'];
         });
-        
-        $nowPlayingMovies = cache()->remember('nowMovies', 60*60*24, function () {
+
+        $nowPlayingMovies = cache()->remember('nowMovies', 60 * 60 * 24, function () {
             return Http::withToken(config('services.tmdb.token'))
-            ->get('https://api.themoviedb.org/3/movie/now_playing')
-            ->json()['results'];
+                ->get('https://api.themoviedb.org/3/movie/now_playing')
+                ->json()['results'];
         });
-           
+
         // If the genres not in the DB not use the cache and uncomment the if let it run 
         // to save all genres in the DDB from the API
-        $genres = cache()->remember('genres', 30*60*60*24, function () {
+        $genres = cache()->remember('genres', 30 * 60 * 60 * 24, function () {
             return Genre::all();
         });
-        
+
         // $genres = Genre::all();
 
         // if ($genres->count() != 19) {
@@ -63,7 +63,7 @@ class MoviesController extends Controller
         //         }
         //     }
         // }
-        
+
         $viewModel = new MoviesViewModel(
             $popularMovies,
             $nowPlayingMovies,
@@ -102,11 +102,11 @@ class MoviesController extends Controller
      */
     public function show($id)
     {
-        
+
         $user = Auth::user()->id;
-        
+
         $userFavorite = Favorite::where('user_id', $user)->where('favorite_id', $id)->select('id')->first();
-        
+
         $movie_db = Movie::where('id', $id)->with('casts', 'crews')->first();
 
         if ($movie_db) {
@@ -146,7 +146,7 @@ class MoviesController extends Controller
             }
 
             $viewModel = new MovieViewModel($movie_db);
-
+            
         } else {
             $movie_api = Http::withToken(config('services.tmdb.token'))
                 ->get('http://api.themoviedb.org/3/movie/' . $id . '?append_to_response=credits,videos,images')
@@ -215,25 +215,25 @@ class MoviesController extends Controller
                 $cast_db = Crew::where('id', $crew_api['id'])->first();
 
                 if ($cast_db == null) {
-                    $crew_db = new Crew;
+                    $crew_db = Crew::create([
+                        'id' => $crew_api['id'],
+                        'adult' => $crew_api['adult'],
+                        'gender' => $crew_api['gender'],
+                        'known_for_department' => $crew_api['known_for_department'],
+                        'name' => $crew_api['name'],
+                        'original_name' => $crew_api['original_name'],
+                        'popularity' => $crew_api['popularity'],
+                        'profile_path' => $crew_api['profile_path'],
+                        'credit_id' => $crew_api['credit_id'],
+                        'department' => $crew_api['department'],
+                        'job' => $crew_api['job'],
+                    ]);
 
-                    $crew_db->id = $crew_api['id'];
-                    $crew_db->adult = $crew_api['adult'];
-                    $crew_db->gender = $crew_api['gender'];
-                    $crew_db->known_for_department = $crew_api['known_for_department'];
-                    $crew_db->name = $crew_api['name'];
-                    $crew_db->original_name = $crew_api['original_name'];
-                    $crew_db->popularity = $crew_api['popularity'];
-                    $crew_db->profile_path = $crew_api['profile_path'];
-                    $crew_db->credit_id = $crew_api['credit_id'];
-                    $crew_db->department = $crew_api['department'];
-                    $crew_db->job = $crew_api['job'];
-                    $crew_db->save();
+                    CrewMovie::create([
+                        'crew_id' => $crew_db->id,
+                        'movie_id' => $movie_db->id,
 
-                    $crew_movie_db = new CrewMovie;
-                    $crew_movie_db->crew_id = $crew_db->id;
-                    $crew_movie_db->movie_id = $movie_db->id;
-                    $crew_movie_db->save();
+                    ]);
 
                     if ($key == 1) {
                         break;
@@ -243,44 +243,36 @@ class MoviesController extends Controller
 
             // images
             foreach ($movie_api['images']['backdrops'] as $key => $image_api) {
-                $image_db = new Image;
-
-                $image_db->type = 'movie';
-                $image_db->related_id = $movie_api['id'];
-                $image_db->aspect_ratio = $image_api['aspect_ratio'];
-                $image_db->file_path = $image_api['file_path'];
-                $image_db->height = $image_api['height'];
-                $image_db->iso_639_1 = $image_api['iso_639_1'];
-                $image_db->vote_average = $image_api['vote_average'];
-                $image_db->vote_count = $image_api['vote_count'];
-                $image_db->width = $image_api['width'];
-                $image_db->save();
+                Image::create([
+                    'type' => 'movie',
+                    'related_id' => $movie_api['id'],
+                    'aspect_ratio' => $image_api['aspect_ratio'],
+                    'file_path' => $image_api['file_path'],
+                    'height' => $image_api['height'],
+                    'iso_639_1' => $image_api['iso_639_1'],
+                    'vote_average' => $image_api['vote_average'],
+                    'vote_count' => $image_api['vote_count'],
+                    'width' => $image_api['width'],
+                ]);
 
                 if ($key == 8) {
                     break;
                 }
             }
 
-            // videos
-            foreach ($movie_api['videos']['results'] as $key => $video_api) {
-                $video_db = new Video;
-
-                $video_db->type = 'movie';
-                $video_db->related_id = $movie_db->id;
-                $video_db->iso_639_1 = $video_api['iso_639_1'];
-                $video_db->iso_3166_1 = $video_api['iso_3166_1'];
-                $video_db->name = $video_api['name'];
-                $video_db->key = $video_api['key'];
-                $video_db->site = $video_api['site'];
-                $video_db->size = $video_api['size'];
-                $video_db->official = $video_api['official'];
-                $video_db->published_at = $video_api['published_at'];
-                $video_db->save();
-
-                if ($key == 0) {
-                    break;
-                }
-            }
+            // Video
+                Video::create([
+                    'type' => 'movie',
+                    'related_id' => $movie_db->id,
+                    'iso_639_1' => $movie_api['videos']['results'][0]['iso_639_1'],
+                    'iso_3166_1' => $movie_api['videos']['results'][0]['iso_3166_1'],
+                    'name' => $movie_api['videos']['results'][0]['name'],
+                    'key' => $movie_api['videos']['results'][0]['key'],
+                    'site' => $movie_api['videos']['results'][0]['site'],
+                    'size' => $movie_api['videos']['results'][0]['size'],
+                    'official' => $movie_api['videos']['results'][0]['official'],
+                    'published_at' => $movie_api['videos']['results'][0]['published_at'],
+                ]);
 
             $viewModel = new MovieViewModel($movie_api);
         }

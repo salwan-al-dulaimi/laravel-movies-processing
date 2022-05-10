@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class CrewMovie extends Model
 {
     use HasFactory;
+    protected $fillable = ['crew_id', 'movie_id'];
 
     protected $table = 'crew_movie';
 
