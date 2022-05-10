@@ -16,7 +16,7 @@ class ActorsController extends Controller
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
-    */
+     */
     public function index($page = 1)
     {
         abort_if($page > 500, 204);
@@ -28,7 +28,7 @@ class ActorsController extends Controller
         return view('actors.index', $viewModel);
     }
 
-    
+
     /**
      * Show the form for creating a new resource.
      *
@@ -59,77 +59,73 @@ class ActorsController extends Controller
     public function show($id)
     {
         $people = People::where('id', $id)->with('socials', 'combinedcredits')->first();
-        
+
         if ($people != null) {
             $actor = $people->toArray();
             $social = $people['socials'][0];
             $credits = $people->combinedcredits[0];
 
             $credits = Http::withToken(config('services.tmdb.token'))
-            ->get('https://api.themoviedb.org/3/person/' . $id . '/combined_credits')
-            ->json();
+                ->get('https://api.themoviedb.org/3/person/' . $id . '/combined_credits')
+                ->json();
 
             $viewModel = new ActorViewModel($actor, $social, $credits);
         } else {
             // people
             $actor = Http::withToken(config('services.tmdb.token'))
-            ->get('https://api.themoviedb.org/3/person/' . $id)
-            ->json();
+                ->get('https://api.themoviedb.org/3/person/' . $id)
+                ->json();
 
             // dd($actor);
 
-            $people = new People();
-
-            $people->id = $actor['id'];
-            $people->name = $actor['name'];
-            $people->birthday = $actor['birthday'];
-            $people->known_for_department = $actor['known_for_department'];
-            $people->deathday = $actor['deathday'];
-            $people['also_known_as'] = json_encode($actor['also_known_as']);
-            $people->gender = $actor['gender'];
-            $people->biography = $actor['biography'];
-            $people->popularity = $actor['popularity'];
-            $people->place_of_birth = $actor['place_of_birth'];
-            $people->profile_path = $actor['profile_path'];
-            $people->adult = $actor['adult'];
-            $people->imdb_id = $actor['imdb_id'];
-            $people->homepage = $actor['homepage'];
-
-            $people->save();
+            $people = People::create([
+                'id' => $actor['id'],
+                'name' => $actor['name'],
+                'birthday' => $actor['birthday'],
+                'known_for_department' => $actor['known_for_department'],
+                'deathday' => $actor['deathday'],
+                'also_known_as' => json_encode($actor['also_known_as']),
+                'gender' => $actor['gender'],
+                'biography' => $actor['biography'],
+                'popularity' => $actor['popularity'],
+                'place_of_birth' => $actor['place_of_birth'],
+                'profile_path' => $actor['profile_path'],
+                'adult' => $actor['adult'],
+                'imdb_id' => $actor['imdb_id'],
+                'homepage' => $actor['homepage'],
+            ]);
 
             $social = Social::where('id', $id)->first();
 
             if ($social == null) {
                 # code...
                 $social = Http::withToken(config('services.tmdb.token'))
-                ->get('https://api.themoviedb.org/3/person/' . $id . '/external_ids')
-                ->json();
-                
-                $newSocial = new Social();
-                
-                $newSocial->id = $id;
-                $newSocial->people_id = $actor['id'];
-                $newSocial->imdb_id = $social['imdb_id'];
-                $newSocial->facebook_id = $social['facebook_id'];
-                $newSocial->freebase_mid = $social['freebase_mid'];
-                $newSocial->freebase_id = $social['freebase_id'];
-                $newSocial->tvrage_id = $social['tvrage_id'];
-                $newSocial->twitter_id = $social['twitter_id'];
-                $newSocial->instagram_id = $social['instagram_id'];
-                
-                $newSocial->save();
+                    ->get('https://api.themoviedb.org/3/person/' . $id . '/external_ids')
+                    ->json();
+
+                Social::create([
+                    'id' => $id,
+                    'people_id' => $actor['id'],
+                    'imdb_id' => $social['imdb_id'],
+                    'facebook_id' => $social['facebook_id'],
+                    'freebase_mid' => $social['freebase_mid'],
+                    'freebase_id' => $social['freebase_id'],
+                    'tvrage_id' => $social['tvrage_id'],
+                    'twitter_id' => $social['twitter_id'],
+                    'instagram_id' => $social['instagram_id'],
+                ]);
             }
-            
+
             $credits = Http::withToken(config('services.tmdb.token'))
-            ->get('https://api.themoviedb.org/3/person/' . $id . '/combined_credits')
-            ->json();
+                ->get('https://api.themoviedb.org/3/person/' . $id . '/combined_credits')
+                ->json();
 
             $newCredits = new CombinedCredits();
 
             $newCredits->id = $id;
             $newCreditsCast = [];
             $newCreditsCrew = [];
-            
+
             foreach ($credits['cast'] as $cast) {
                 array_push($newCreditsCast, $cast['id']);
             }

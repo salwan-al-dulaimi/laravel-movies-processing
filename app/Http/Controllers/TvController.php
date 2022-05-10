@@ -115,13 +115,11 @@ class TvController extends Controller
             }
 
             $viewModel = new TvShowViewModel($tv_db);
-            // dd($viewModel);
         } else {
 
             $tvshow = Http::withToken(config('services.tmdb.token'))
                 ->get('http://api.themoviedb.org/3/tv/' . $id . '?append_to_response=credits,videos,images')
                 ->json();
-            // dd($tvshow);
 
             $tv_db = new Tv;
             $tv_db->id = $tvshow['id'];
@@ -163,46 +161,39 @@ class TvController extends Controller
             }
 
             // Crew
-            foreach ($tvshow['credits']['crew'] as $key => $crew_api) {
-                $crew_db = new Crew;
+            $crew_db = Crew::create([
+                'id' => $tvshow['credits']['crew'][0]['id'],
+                'adult' => $tvshow['credits']['crew'][0]['adult'],
+                'gender' => $tvshow['credits']['crew'][0]['gender'],
+                'known_for_department' => $tvshow['credits']['crew'][0]['known_for_department'],
+                'name' => $tvshow['credits']['crew'][0]['name'],
+                'original_name' => $tvshow['credits']['crew'][0]['original_name'],
+                'popularity' => $tvshow['credits']['crew'][0]['popularity'],
+                'profile_path' => $tvshow['credits']['crew'][0]['profile_path'],
+                'credit_id' => $tvshow['credits']['crew'][0]['credit_id'],
+                'department' => $tvshow['credits']['crew'][0]['department'],
+                'job' => $tvshow['credits']['crew'][0]['job'],
+            ]);
 
-                $cast_db->id = $crew_api['id'];
-                $crew_db->adult = $crew_api['adult'];
-                $crew_db->gender = $crew_api['gender'];
-                $crew_db->known_for_department = $crew_api['known_for_department'];
-                $crew_db->name = $crew_api['name'];
-                $crew_db->original_name = $crew_api['original_name'];
-                $crew_db->popularity = $crew_api['popularity'];
-                $crew_db->profile_path = $crew_api['profile_path'];
-                $crew_db->credit_id = $crew_api['credit_id'];
-                $crew_db->department = $crew_api['department'];
-                $crew_db->job = $crew_api['job'];
-                $crew_db->save();
-
-                $crew_tv_db = new CrewTv;
-                $crew_tv_db->crew_id = $crew_db->id;
-                $crew_tv_db->tv_id = $tvshow['id'];
-                $crew_tv_db->save();
-
-                if ($key == 1) {
-                    break;
-                }
-            }
+            CrewTv::create([
+                'crew_id' => $crew_db->id,
+                'tv_id' => $tvshow['id'],
+            ]);
 
             // images
             foreach ($tvshow['images']['backdrops'] as $key => $image_api) {
-                $image_db = new Image;
+                Image::create([
+                    'type' => 'tv',
+                    'related_id' => $tvshow['id'],
+                    'aspect_ratio' => $image_api['aspect_ratio'],
+                    'file_path' => $image_api['file_path'],
+                    'height' => $image_api['height'],
+                    'iso_639_1' => $image_api['iso_639_1'],
+                    'vote_average' => $image_api['vote_average'],
+                    'vote_count' => $image_api['vote_count'],
+                    'width' => $image_api['width'],
+                ]);
 
-                $image_db->type = 'tv';
-                $image_db->related_id = $tvshow['id'];
-                $image_db->aspect_ratio = $image_api['aspect_ratio'];
-                $image_db->file_path = $image_api['file_path'];
-                $image_db->height = $image_api['height'];
-                $image_db->iso_639_1 = $image_api['iso_639_1'];
-                $image_db->vote_average = $image_api['vote_average'];
-                $image_db->vote_count = $image_api['vote_count'];
-                $image_db->width = $image_api['width'];
-                $image_db->save();
 
                 if ($key == 8) {
                     break;
