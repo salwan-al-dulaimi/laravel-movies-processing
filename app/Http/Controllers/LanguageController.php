@@ -13,6 +13,8 @@ class LanguageController extends Controller
         $languages = Http::withToken(config('services.tmdb.token'))
         ->get('http://api.themoviedb.org/3/configuration/languages')
         ->json();
+        $languages = collect($languages)->sortBy(['english_name', 'asc']);
+        // dd($languages);
 
         return view('language.index', ['languages' => $languages]);
     }
