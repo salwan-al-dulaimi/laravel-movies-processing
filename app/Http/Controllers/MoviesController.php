@@ -200,12 +200,10 @@ class MoviesController extends Controller
                         'order' => $cast_api['order'],
                     ]);
 
-                    // $cast_db->save();
-
-                    $cast_movie_db = new CastMovie;
-                    $cast_movie_db->cast_id = $cast_db->id;
-                    $cast_movie_db->movie_id = $movie_db->id;
-                    $cast_movie_db->save();
+                    CastMovie::create([
+                        'cast_id' => $cast_db->id,
+                        'movie_id' => $movie_db->id
+                    ]);
 
                     if ($key == 4) {
                         break;

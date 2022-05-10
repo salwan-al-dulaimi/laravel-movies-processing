@@ -9,6 +9,8 @@ class CastMovie extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['cast_id', 'movie_id'];
+
     protected $table = 'cast_movie';
 
     public function casts()
