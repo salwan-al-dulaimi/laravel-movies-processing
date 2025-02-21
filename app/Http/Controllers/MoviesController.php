@@ -39,7 +39,7 @@ class MoviesController extends Controller
                 ->json()['results'];
         });
 
-        // If the genres not in the DB not use the cache and uncomment the if let it run 
+        // If the genres not in the DB not use the cache and uncomment the if let it run
         // to save all genres in the DDB from the API
         $genres = cache()->remember('genres', 30 * 60 * 60 * 24, function () {
             return Genre::all();
@@ -112,10 +112,9 @@ class MoviesController extends Controller
         if ($movie_db) {
 
             $movie_db = $movie_db->toArray() + ['credits' => ['cast' => []] + ['crew' => []]] + ['images' => ['backdrops' => []]] + ['videos' => ['results' => []]];
-
             foreach ($movie_db['casts'] as $key => $cast) {
                 $cast = Cast::where('id', $cast['cast_id'])->first();
-                $cast = $cast->toArray();
+                $cast =  $cast->toArray();
 
                 array_push($movie_db['credits']['cast'], $cast);
                 if ($key == 4) {
@@ -146,7 +145,6 @@ class MoviesController extends Controller
             }
 
             $viewModel = new MovieViewModel($movie_db);
-            
         } else {
             $movie_api = Http::withToken(config('services.tmdb.token'))
                 ->get('http://api.themoviedb.org/3/movie/' . $id . '?append_to_response=credits,videos,images')
@@ -261,18 +259,18 @@ class MoviesController extends Controller
             }
 
             // Video
-                Video::create([
-                    'type' => 'movie',
-                    'related_id' => $movie_db->id,
-                    'iso_639_1' => $movie_api['videos']['results'][0]['iso_639_1'],
-                    'iso_3166_1' => $movie_api['videos']['results'][0]['iso_3166_1'],
-                    'name' => $movie_api['videos']['results'][0]['name'],
-                    'key' => $movie_api['videos']['results'][0]['key'],
-                    'site' => $movie_api['videos']['results'][0]['site'],
-                    'size' => $movie_api['videos']['results'][0]['size'],
-                    'official' => $movie_api['videos']['results'][0]['official'],
-                    'published_at' => $movie_api['videos']['results'][0]['published_at'],
-                ]);
+            Video::create([
+                'type' => 'movie',
+                'related_id' => $movie_db->id,
+                'iso_639_1' => $movie_api['videos']['results'][0]['iso_639_1'] ? $movie_api['videos']['results'][0]['iso_639_1'] : "",
+                'iso_3166_1' => $movie_api['videos']['results'][0]['iso_3166_1'],
+                'name' => $movie_api['videos']['results'][0]['name'],
+                'key' => $movie_api['videos']['results'][0]['key'],
+                'site' => $movie_api['videos']['results'][0]['site'],
+                'size' => $movie_api['videos']['results'][0]['size'],
+                'official' => $movie_api['videos']['results'][0]['official'],
+                'published_at' => $movie_api['videos']['results'][0]['published_at'],
+            ]);
 
             $viewModel = new MovieViewModel($movie_api);
         }

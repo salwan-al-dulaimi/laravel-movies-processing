@@ -61,9 +61,10 @@ class ActorsController extends Controller
         $people = People::where('id', $id)->with('socials', 'combinedcredits')->first();
 
         if ($people != null) {
+
             $actor = $people->toArray();
-            $social = $people['socials'][0];
-            $credits = $people->combinedcredits[0];
+            $social = null;
+            $credits = null;
 
             $credits = Http::withToken(config('services.tmdb.token'))
                 ->get('https://api.themoviedb.org/3/person/' . $id . '/combined_credits')
@@ -75,8 +76,6 @@ class ActorsController extends Controller
             $actor = Http::withToken(config('services.tmdb.token'))
                 ->get('https://api.themoviedb.org/3/person/' . $id)
                 ->json();
-
-            // dd($actor);
 
             $people = People::create([
                 'id' => $actor['id'],
@@ -97,24 +96,21 @@ class ActorsController extends Controller
 
             $social = Social::where('id', $id)->first();
 
-            if ($social == null) {
-                # code...
-                $social = Http::withToken(config('services.tmdb.token'))
-                    ->get('https://api.themoviedb.org/3/person/' . $id . '/external_ids')
-                    ->json();
+            $social = Http::withToken(config('services.tmdb.token'))
+                ->get('https://api.themoviedb.org/3/person/' . $id . '/external_ids')
+                ->json();
 
-                Social::create([
-                    'id' => $id,
-                    'people_id' => $actor['id'],
-                    'imdb_id' => $social['imdb_id'],
-                    'facebook_id' => $social['facebook_id'],
-                    'freebase_mid' => $social['freebase_mid'],
-                    'freebase_id' => $social['freebase_id'],
-                    'tvrage_id' => $social['tvrage_id'],
-                    'twitter_id' => $social['twitter_id'],
-                    'instagram_id' => $social['instagram_id'],
-                ]);
-            }
+            Social::create([
+                'id' => $id,
+                'people_id' => optional($actor['id']),
+                'imdb_id' => optional($social['imdb_id']),
+                'facebook_id' => optional($social['facebook_id']),
+                'freebase_mid' => optional($social['freebase_mid']),
+                'freebase_id' => optional($social['freebase_id']),
+                'tvrage_id' => optional($social['tvrage_id']),
+                'twitter_id' => optional($social['twitter_id']),
+                'instagram_id' => optional($social['instagram_id']),
+            ]);
 
             $credits = Http::withToken(config('services.tmdb.token'))
                 ->get('https://api.themoviedb.org/3/person/' . $id . '/combined_credits')
@@ -139,10 +135,11 @@ class ActorsController extends Controller
             $newCredits->save();
 
             $viewModel = new ActorViewModel($actor, $social, $credits);
-        }
 
-        return view('actors.show', $viewModel);
+            return view('actors.show', $viewModel);
+        }
     }
+
 
     /**
      * Show the form for editing the specified resource.
